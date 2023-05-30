@@ -1,17 +1,17 @@
-const contactsService = require("../models/contacts");
+const service = require("../service")
 
-const { HttpError } = require("../helpers");
+const HttpError = require("../helpers");
 
 const {ctrlWrapper} = require("../utils");
 
   const getAllContacts = async (req, res) => {
-      const result = await contactsService.listContacts();
+      const result = await service.listContacts();
       res.status(200).json(result);
   }
 
   const getContact = async (req, res) => {
       const { contactId } = req.params;
-      const result = await contactsService.getContactById(contactId);
+      const result = await service.getContactById(contactId);
       if (!result) {
         throw HttpError(404, `Not found`);
       }
@@ -19,15 +19,15 @@ const {ctrlWrapper} = require("../utils");
   }
 
   const addContact =  async (req, res) => {
-      const result = await contactsService.addContact(req.body);
+      const result = await service.addContact(req.body);
       res.status(201).json(req.body);
   }
 
   const deleteContact = async (req, res) => {
       const { contactId } = req.params;
-      const result = await contactsService.removeContact(contactId);
+      const result = await service.removeContact(contactId);
       if (!result) {
-        throw HttpError(404, `Movie with ${contactId} not found`);
+        throw HttpError(404, `Contact with ${contactId} not found`);
       }
       res.json({
         message: "Delete success",
@@ -36,11 +36,20 @@ const {ctrlWrapper} = require("../utils");
 
   const updateContact = async (req, res) => {
       const { contactId } = req.params;
-      const result = await contactsAddSchema.updateContact(contactId, req.body);
+      const result = await service.updateContact(contactId, req.body);
       if (!result) {
-        throw HttpError(404, `Movie with ${contactId} not found`);
+        throw HttpError(404, `Contact with ${contactId} not found`);
       }
-      res.json(result);
+      res.status(200).json(result);
+  }
+
+  const updateStatusContact = async (req, res) => {
+    const {contactId} =req.params;
+    const result = await service.updateStatusContact(contactId, req.body);
+    if (!result) {
+      throw HttpError(404, `Contact with ${contactId} not found`)
+    }
+    res.status(200).json(result)
   }
 
   module.exports = {
@@ -48,5 +57,6 @@ const {ctrlWrapper} = require("../utils");
     getContact: ctrlWrapper(getContact),
     addContact: ctrlWrapper(addContact),
     deleteContact: ctrlWrapper(deleteContact),
-    updateContact: ctrlWrapper(updateContact)
+    updateContact: ctrlWrapper(updateContact),
+    updateStatusContact: ctrlWrapper(updateStatusContact)
   }
