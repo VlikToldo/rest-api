@@ -12,6 +12,13 @@ const contactsAddSchema = Joi.object({
     }),
   });
 
+const contactUpdateStatus = Joi.object({
+  favorite: Joi.boolean().required().messages({
+    "any.required": "missing field favorite"
+  }),
+})
+
   module.exports = {
-    contactsAddSchema
-  }
+    contactsAddSchema,
+    contactUpdateStatus
+  };

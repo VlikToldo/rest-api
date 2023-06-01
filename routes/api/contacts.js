@@ -1,7 +1,6 @@
 const express = require("express");
 
 const contactsControllers = require("../../controllers/contacts-controllers");
-
 const schemas = require("../../schema/contacts-schema");
 
 const {validateBody} = require("../../utils");
@@ -17,5 +16,7 @@ router.post("/", validateBody(schemas.contactsAddSchema), contactsControllers.ad
 router.delete("/:contactId", contactsControllers.deleteContact);
 
 router.put("/:contactId", validateBody(schemas.contactsAddSchema), contactsControllers.updateContact);
+
+router.patch('/:contactId/favorite', validateBody(schemas.contactUpdateStatus), contactsControllers.updateStatusContact);
 
 module.exports = router;
