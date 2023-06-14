@@ -62,5 +62,5 @@ const {ctrlWrapper} = require("../utils");
     addContact: ctrlWrapper(addContact),
     deleteContact: ctrlWrapper(deleteContact),
     updateContact: ctrlWrapper(updateContact),
-    updateStatusContact: ctrlWrapper(updateStatusContact)
+    updateStatusContact: ctrlWrapper(updateStatusContact),
   }

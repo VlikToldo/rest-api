@@ -1,20 +1,30 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const Jimp = require("jimp");
+const fs = require("fs/promises");
+const path = require("path");
 
 const { User } = require("../service/");
 
 const { ctrlWrapper } = require("../utils");
 
-const {HttpError} = require("../helpers")
+const { HttpError } = require("../helpers");
 
 const { SECRET_KEY } = process.env;
 
+const avatarsPath = path.resolve("public", "avatars");
+
 const registerUser = async (req, res) => {
+  const avatar = gravatar.url(req.body.email);
+
   const newUser = {
     email: req.body.email,
     password: req.body.password,
     subscription: req.body.subscription,
+    avatarURL: avatar,
   };
+
   const currentUser = await User.findUserByEmail({ email: newUser.email });
   if (currentUser !== null) {
     throw new HttpError(409, `Email in use`);
@@ -68,17 +78,35 @@ const logout = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-  const {email, subscription} = req.user;
+  const { email, subscription } = req.user;
 
   res.json({
     email,
-    subscription
-  })
+    subscription,
+  });
+};
+
+const updateAvatar = async (req, res) => {
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(avatarsPath, filename);
+  await fs.rename(oldPath, newPath);
+
+  Jimp.read(newPath, (err, img) => {
+    if (err) throw err;
+    img.resize(250, 250).write(newPath);
+  });
+
+  const avatar = path.join("avatars", filename);
+
+  const { _id } = req.user;
+  await User.updateAvatar(_id, avatar);
+  res.json({ avatar });
 };
 
 module.exports = {
   registerUser: ctrlWrapper(registerUser),
   loginUser: ctrlWrapper(loginUser),
   logout: ctrlWrapper(logout),
-  getCurrent: ctrlWrapper(getCurrent)
+  getCurrent: ctrlWrapper(getCurrent),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
